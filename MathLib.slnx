@@ -3,5 +3,5 @@
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
-  <Project Path="MathLib/MathLib.vcxproj" />
+  <Project Path="MathLib/MathLib.vcxproj" Id="fc6fef1f-7657-4e8f-8405-bf9397633fd5" />
 </Solution>

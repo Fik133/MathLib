@@ -1,6 +1,6 @@
 #include <math.h>
 namespace mathlib {
-	inline double PI = 3.14159f;
+	inline constexpr double PI = 3.14159265358979323846;
 	inline double floor(double value) {
 		int i = static_cast<int>(value);
 
@@ -20,30 +20,45 @@ namespace mathlib {
 		return result;
 	}
 	inline double sin(double angle) {
-		constexpr int PRECISION = 10; // length of the sin series, the more the higher precision
+		constexpr int PRECISION = 10; // length of the sin series, the higher the number the higher the precision
 		double currentAngle = angle;
 
-		if (angle > 2 * PI) {
-			double multiplier = currentAngle / (2 * PI);
-			int safe_multiplier = floor(multiplier);
-			currentAngle = currentAngle - (static_cast<double>(safe_multiplier) * (2 * PI));
-		}
-		else if (angle < -2 * PI) {
-			double multiplier = currentAngle / (2 * PI);
-			int safe_multiplier = floor(multiplier);
-			currentAngle = currentAngle - (static_cast<double>(safe_multiplier) * (2 * PI));
-		}
+		// let say angle = 15 => 15.0 / 6.28 = 2.388 or angle = -15 => -15.0 / 6.28 = -2.388
+		// so static cast makes the safe_multiplier = 2 or safe_multiplier = -2
+		// and it adds up the value of 2 * PI which is currentAngle -= 2 * 6.28 or currentAngle -= (-2) * 6.28 so currentAngle += 2 * 6.28
+		int safe_multiplier = static_cast<int>(currentAngle / (2 * PI));
+		currentAngle -= safe_multiplier * (2 * PI);
 
 		double result = 0.0;
 		double term = currentAngle;
 
+		//this sums up to a simple series of sum n = 0 to n = PRECISION (-1)^n * x^(2n+1)/(2n+1)!
 		for (size_t n = 1; n <= PRECISION; n++)
 		{
 			result += term;
-
-			term = -term * (currentAngle * currentAngle) / ((2 * n) * (2 * n + 1));
+			term = -(term * (currentAngle * currentAngle)) / ((2 * n) * (2 * n + 1));
 		}
 
 		return result;
+	}
+
+	inline double cos(double angle) {
+		// sure I could've made this function with another series and it'd work just fine
+		// but I wanted to use the DRY rule from Pragmatic Programmer book
+		return sin(angle + (PI / 2));
+	}
+
+	inline double tan(double angle) {
+		// basic trigonometric identity: tan(x) = sin(x)/cos(x)
+		const double rise = sin(angle);
+		const double run = cos(angle);
+
+		if (run == 0) {
+			// this simple code returns infinity or -infinity
+			// and yes it's safe so there'll be no exceptions
+			return rise >= 0 ? 1.0 / 0.0 : -1.0 / 0.0;
+		}
+
+		return rise / run;
 	}
 }
