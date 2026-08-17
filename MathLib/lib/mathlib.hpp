@@ -1,6 +1,9 @@
 #include <math.h>
 namespace mathlib {
 	inline constexpr double PI = 3.14159265358979323846;
+	inline double abs(double value) {
+		return value < 0 ? -value : value;
+	}
 	inline double floor(double value) {
 		int i = static_cast<int>(value);
 
@@ -20,7 +23,7 @@ namespace mathlib {
 		return result;
 	}
 	inline double sin(double angle) {
-		constexpr int PRECISION = 10; // length of the sin series, the higher the number the higher the precision
+		constexpr int PRECISION = 10; // length of the sine series, the higher the number the higher the precision
 		double currentAngle = angle;
 
 		// let say angle = 15 => 15.0 / 6.28 = 2.388 or angle = -15 => -15.0 / 6.28 = -2.388
@@ -60,5 +63,39 @@ namespace mathlib {
 		}
 
 		return rise / run;
+	}
+
+	// Inverse trigonometric functions
+
+	inline double atan(double value) {
+		// trigonometric identity -atan(x) = atan(-x)
+		// I used it so I wouldn't repeat myself below
+		if (value < 0.0) {
+			return -atan(-value);
+		}
+
+		// this series works correctly only for values = [from -1 to 1]
+		// so I had to use trig identity atan(x) = PI/2 - atan(1/x)
+		if (value > 1.0) {
+			return (PI / 2.0) - atan(1.0 / value);
+		}
+
+		// atan series -> sum n = 0, n = a (-1)^n * x^(2n+1)/(2n+1)
+		double term = value;
+		double result = 0.0;
+		constexpr double PRECISION = 1000;
+		for (double n = 0; n < PRECISION; n++)
+		{
+			result += term;
+			term = -term * (value * value) * ((2.0 * n + 1.0) / (2.0 * n + 3.0));
+
+			// maximum double precision is 1 * 10^-16
+			// so we wanna break from the loop once we reach that point
+			if (abs(term) < 1e-16) {
+				break;
+			}
+		}
+
+		return result;
 	}
 }
