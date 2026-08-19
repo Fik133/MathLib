@@ -1,6 +1,13 @@
 #include <math.h>
 namespace mathlib {
-	inline constexpr double PI = 3.14159265358979323846;
+	namespace constants {
+		inline constexpr double PI = 3.14159265358979323846;
+	}
+
+	namespace definitions {
+		inline const double NaN = 0.0 / 0.0;
+	}
+
 	inline double abs(double value) {
 		return value < 0 ? -value : value;
 	}
@@ -29,8 +36,8 @@ namespace mathlib {
 		// let say angle = 15 => 15.0 / 6.28 = 2.388 or angle = -15 => -15.0 / 6.28 = -2.388
 		// so static cast makes the safe_multiplier = 2 or safe_multiplier = -2
 		// and it adds up the value of 2 * PI which is currentAngle -= 2 * 6.28 or currentAngle -= (-2) * 6.28 so currentAngle += 2 * 6.28
-		int safe_multiplier = static_cast<int>(currentAngle / (2 * PI));
-		currentAngle -= safe_multiplier * (2 * PI);
+		int safe_multiplier = static_cast<int>(currentAngle / (2 * constants::PI));
+		currentAngle -= safe_multiplier * (2 * constants::PI);
 
 		double result = 0.0;
 		double term = currentAngle;
@@ -48,7 +55,7 @@ namespace mathlib {
 	inline double cos(double angle) {
 		// sure I could've made this function with another series and it'd work just fine
 		// but I wanted to use the DRY rule from Pragmatic Programmer book
-		return sin(angle + (PI / 2));
+		return sin(angle + (constants::PI / 2));
 	}
 
 	inline double tan(double angle) {
@@ -67,6 +74,7 @@ namespace mathlib {
 
 	// Inverse trigonometric functions
 
+	// Inverse arcus tangens [Taylor Series]
 	inline double atan(double value) {
 		// trigonometric identity -atan(x) = atan(-x)
 		// I used it so I wouldn't repeat myself below
@@ -76,26 +84,65 @@ namespace mathlib {
 
 		// this series works correctly only for values = [from -1 to 1]
 		// so I had to use trig identity atan(x) = PI/2 - atan(1/x)
-		if (value > 1.0) {
-			return (PI / 2.0) - atan(1.0 / value);
+		if (value > 1) {
+			return (constants::PI / 2.0) - atan(1.0 / value);
 		}
 
-		// atan series -> sum n = 0, n = a (-1)^n * x^(2n+1)/(2n+1)
+		// atan series -> sum n = 0 to n = PRECISION (-1)^n * x^(2n+1)/(2n+1)
 		double term = value;
 		double result = 0.0;
 		constexpr double PRECISION = 1000;
 		for (double n = 0; n < PRECISION; n++)
 		{
 			result += term;
-			term = -term * (value * value) * ((2.0 * n + 1.0) / (2.0 * n + 3.0));
 
 			// maximum double precision is 1 * 10^-16
 			// so we wanna break from the loop once we reach that point
 			if (abs(term) < 1e-16) {
 				break;
 			}
+
+			term = -term * (value * value) * ((2.0 * n + 1.0) / (2.0 * n + 3.0));
 		}
 
 		return result;
 	}
+
+	// Inverse arcus sine [Taylor Series]
+	inline double asin(double value) {
+		if (abs(value) > 1) // sine can be only in range from -1 to 1
+			return definitions::NaN;
+
+		if (value < -0.5) {
+			return -asin(-value);
+		}
+
+		// need this because when value is close to 1 the series converges really slowly
+		// so to fix that I had to change the range from -1 to 1 to a range from -0.5 to 0.5
+		if (value > 0.5) {
+			return constants::PI / 2.0 - 2.0 * asin(sqrt((1 - value) / 2));
+		}
+		constexpr size_t PRECISION = 100;
+
+		double term = value;
+		double result = 0.0;
+
+		// asin series -> sum n = 0 to PRECISION ((2n-1)!!)/((2n)!! * (2n+1)) * x^(2n+1)
+		for (size_t n = 0; n < PRECISION; n++)
+		{
+			result += term;
+
+			// maximum double precision is 1 * 10^-16
+			// so we wanna break from the loop once we reach that point
+			if (abs(term) < 1e-16) {
+				break;
+			}
+
+			term = (term * (value * value)) * ((2 * n + 1) * (2 * n + 1)) / ((2 * n + 2) * (2 * n + 3));
+		}
+
+		return result;
+	}
+
+	// add sqrt function
 }
