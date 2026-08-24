@@ -2,15 +2,26 @@
 namespace mathlib {
 	namespace constants {
 		inline constexpr double PI = 3.14159265358979323846;
+		inline constexpr double E = 2.71828182845904523536;
 	}
 
 	namespace definitions {
 		inline const double NaN = 0.0 / 0.0;
+		inline const double INF = 1.0 / 0.0;
+	}
+
+	inline double degrees(double rad) {
+		return (180.0 / constants::PI) * rad;
+	}
+
+	inline double radians(double deg) {
+		return (constants::PI / 180.0) * deg;
 	}
 
 	inline double abs(double value) {
 		return value < 0 ? -value : value;
 	}
+
 	inline double floor(double value) {
 		int i = static_cast<int>(value);
 
@@ -20,6 +31,12 @@ namespace mathlib {
 
 		return i;
 	}
+
+	inline double ceil(double value) {
+		const double f = floor(value);
+		return f != value ? f + 1.0 : f;
+	}
+
 	inline unsigned int factorial(unsigned int value) {
 		if (value == 0) return 1;
 
@@ -29,6 +46,8 @@ namespace mathlib {
 		}
 		return result;
 	}
+
+	// Sine trigonometric function [Taylor series]
 	inline double sin(double angle) {
 		constexpr int PRECISION = 10; // length of the sine series, the higher the number the higher the precision
 		double currentAngle = angle;
@@ -74,7 +93,7 @@ namespace mathlib {
 
 	// Inverse trigonometric functions
 
-	// Inverse arcus tangens [Taylor Series]
+	// Inverse tangent [Taylor Series]
 	inline double atan(double value) {
 		// trigonometric identity -atan(x) = atan(-x)
 		// I used it so I wouldn't repeat myself below
@@ -108,7 +127,7 @@ namespace mathlib {
 		return result;
 	}
 
-	// Inverse arcus sine [Taylor Series]
+	// Inverse sine [Taylor Series]
 	inline double asin(double value) {
 		if (abs(value) > 1) // sine can be only in range from -1 to 1
 			return definitions::NaN;
@@ -142,6 +161,58 @@ namespace mathlib {
 		}
 
 		return result;
+	}
+
+	// Inverse cosine based on defined arcus sine
+	inline double acos(double value) {
+		// trigonometric identity acos(x) = PI/2 - asin(x)
+		if (abs(value) > 1) return definitions::NaN;
+		return (constants::PI / 2) - asin(value);
+	}
+
+	// Inverse cotangent based on defined inverse tangent
+	inline double acot(double value) {
+		// trigonometric identity acot(x) = PI/2 - atan(x)
+		return (constants::PI / 2) - atan(value);
+	}
+
+	// Natural logarithm
+	inline double ln(double value) {
+		// value of ln(0) is undefined
+		// value of ln(x < 0) doesn't belong to the set of real numbers
+		if (value <= 0)
+			return definitions::NaN;
+
+		long int k = 0;
+
+		// need this because when the value is bigger than 2 this series diverges
+		// you can derrive this by x = e^k * m => ln (e^k * m) = k + ln(m)
+		// i'm getting k value here where value so the m is < 2
+		while (value > 2) {
+			value /= constants::E;
+			k++;
+		}
+
+		constexpr size_t PRECISION = 100;
+
+		// i had to use -1.0 because i'm getting the output of function g(x) = ln(x+1) so to get x I'm doing (x - 1) operation
+		double term = value - 1.0;
+		double result = 0.0;
+
+		for (size_t n = 1; n <= PRECISION; n++)
+		{
+			result += term;
+
+			// maximum double precision is 1 * 10^-16
+			// so we wanna break from the loop once we reach that point
+			if (abs(term) < 1e-16) {
+				break;
+			}
+
+			term = -term * (n) / (n + 1.0) * (value - 1.0);
+		}
+
+		return static_cast<double>(k) + result; // ln(e^k * m) = k + ln(m)
 	}
 
 	// add sqrt function
