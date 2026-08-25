@@ -7,7 +7,8 @@ namespace mathlib {
 
 	namespace definitions {
 		inline const double NaN = 0.0 / 0.0;
-		inline const double INF = 1.0 / 0.0;
+		inline const double INF_POSITIVE = 1.0 / 0.0;
+		inline const double INF_NEGATIVE = -1.0 / 0.0;
 	}
 
 	inline double degrees(double rad) {
@@ -261,6 +262,41 @@ namespace mathlib {
 		}
 
 		return result;
+	}
+
+	// Power a^x function implemented using ln and exp functions
+
+	inline double pow(double base, double power) {
+		// 0^0 is undefined in mathematical analysis but since we're in a real world I had to define it somehow
+		// since a^0 where a != 0 for every real number is equal to 1 then 1 is a pretty good guess
+		if (power == 0)
+			return 1.0;
+
+		if (base == 0) {
+			// since x^-n = 1/x^n and when x = 0 then this expression is equal to 1/0 which is +inf
+			if (power < 0) {
+				return definitions::INF_POSITIVE;
+			}
+			return 0.0;
+		}
+
+		if (base < 0) {
+			long long int_power = static_cast<long long>(power);
+
+			if (int_power != power) {
+				// if power is fractional like 1/2 it means it's a root and we can't get root of -1 in the set of real numbers
+				// to do so we'd need to use imaginary set of numbers and I don't really want to implement that
+				// maybe some day but I doubt it :P
+				return definitions::NaN;
+			}
+
+			// even power -> 1 odd -> -1
+			short direction = (int_power % 2 == 0) ? 1 : -1;
+
+			return direction * exp(ln(abs(base)) * power);
+		}
+
+		return exp(ln(base) * power);
 	}
 
 	// add sqrt function and add it to asin function
