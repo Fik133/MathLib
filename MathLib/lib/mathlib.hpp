@@ -188,9 +188,13 @@ namespace mathlib {
 		// need this because when the value is bigger than 2 this series diverges
 		// you can derrive this by x = e^k * m => ln (e^k * m) = k + ln(m)
 		// i'm getting k value here where value so the m is < 2
-		while (value > 2) {
+		while (value > 1.5) {
 			value /= constants::E;
 			k++;
+		}
+		while (value < 0.5) {
+			value *= constants::E;
+			k--;
 		}
 
 		constexpr size_t PRECISION = 100;
@@ -215,5 +219,49 @@ namespace mathlib {
 		return static_cast<double>(k) + result; // ln(e^k * m) = k + ln(m)
 	}
 
-	// add sqrt function
+	// Exponential function e^x
+	inline double exp(double value) {
+		// 0^0 is undefined in mathematical analysis but since we're in a real world I had to define it somehow
+		// since a^0 where a != 0 for every real number is equal to 1 then 1 is a pretty good guess
+		if (value == 0.0) return 1.0;
+
+		// this basically shifts from negative value to positive because in order to get e^x where x is big
+		// i'd have to set the precision up to a very high number or it might be even impossible because of a variable limits
+		// also the series would shift to 1 - value + value^2/2! - a + ... a_n so the function diverges way slower
+		if (value < 0.0) {
+			return 1.0 / exp(-value);
+		}
+
+		// using magic of recursion we change the range of this function. it will do this operation until the condition is met
+		// basic power identity e^x = (e^x/2)^2
+		if (value > 1.0) {
+			double half_exp = exp(value / 2);
+			return half_exp * half_exp;
+		}
+
+		// term = 1.0 because I assume that x != 0 and a = x^n/n! = x^0/0! = 1
+		// and if value = x = 0 then in mathematical analysis the symbol 0^0 is undefined
+		// so in that case for the very first term in our series we'd get undefined symbol
+		double term = 1.0;
+		double result = 0.0;
+		constexpr size_t PRECISION = 100;
+
+		// taylor series -> sum n = 0 to n = PRECISION x^n/n!
+		for (size_t n = 0; n < PRECISION; n++)
+		{
+			result += term;
+
+			// maximum double precision is 1 * 10^-16
+			// so we wanna break from the loop once we reach that point
+			if (abs(term) < 1e-16) {
+				break;
+			}
+
+			term = term * (value / (n + 1.0));
+		}
+
+		return result;
+	}
+
+	// add sqrt function and add it to asin function
 }
