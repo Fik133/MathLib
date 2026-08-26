@@ -48,6 +48,26 @@ namespace mathlib {
 		return result;
 	}
 
+	template<typename T>
+	inline void swap(T& e1, T& e2) {
+		T temp1 = e1;
+		e1 = e2;
+		e2 = temp1;
+	}
+
+	template<typename T>
+	inline T clamp(T value, T min, T max) {
+		if (min > max)
+			swap(max, min);
+
+		return (value > max) ? max : ((value < min) ? min : value);
+	}
+
+	template<typename T>
+	inline T lerp(T a, T b, double t) {
+		return static_cast<T>(a + (b - a) * t);
+	}
+
 	// Sine trigonometric function [Taylor series]
 	inline double sin(double angle) {
 		constexpr int PRECISION = 10; // length of the sine series, the higher the number the higher the precision
