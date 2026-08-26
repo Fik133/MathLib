@@ -111,7 +111,7 @@ namespace mathlib {
 		// atan series -> sum n = 0 to n = PRECISION (-1)^n * x^(2n+1)/(2n+1)
 		double term = value;
 		double result = 0.0;
-		constexpr double PRECISION = 1000;
+		constexpr double PRECISION = 10000;
 		for (double n = 0; n < PRECISION; n++)
 		{
 			result += term;
@@ -175,6 +175,29 @@ namespace mathlib {
 	inline double acot(double value) {
 		// trigonometric identity acot(x) = PI/2 - atan(x)
 		return (constants::PI / 2) - atan(value);
+	}
+
+	// Inverse full range tangent defined on inverse tangent
+	inline double atan2(double y, double x) {
+		// 1st and 4th quadrant
+		if (x > 0)
+			return atan(y / x);
+		if (x < 0) {
+			// 2nd quadrant
+			if (y >= 0) {
+				return atan(y / x) + constants::PI;
+			}
+			// 3rd quadrant
+			else {
+				return atan(y / x) - constants::PI;
+			}
+		}
+
+		// Y-axis (x == 0)
+		if (y > 0) return constants::PI / 2;
+		if (y < 0) return -constants::PI / 2;
+
+		return 0.0;
 	}
 
 	// Natural logarithm
@@ -300,4 +323,9 @@ namespace mathlib {
 	}
 
 	// add sqrt function and add it to asin function
+	inline double sqrt(double value) {
+		if (value < 0) return definitions::NaN;
+		if (value == 0) return 0.0;
+		// to be finished
+	}
 }

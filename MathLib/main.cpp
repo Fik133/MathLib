@@ -4,7 +4,8 @@
 #include <math.h>
 #include <vector>
 #include <utility>
+#include <chrono>
 
 int main() {
-	std::cout << std::setprecision(15) << mathlib::pow(-0, -3);
+	std::cout << mathlib::sqrt(3);
 }
