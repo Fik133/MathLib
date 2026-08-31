@@ -68,6 +68,7 @@ namespace mathlib {
 		return static_cast<T>(a + (b - a) * t);
 	}
 
+	// Newton-Raphson Method Square Root
 	inline double sqrt(double value) {
 		if (value < 0) return definitions::NaN;
 		if (value == 0) return 0.0;
@@ -85,6 +86,7 @@ namespace mathlib {
 		return result;
 	}
 
+	// Newton-Raphson Method Cube Root
 	inline double cbrt(double value) {
 		if (value == 0) return 0.0;
 
@@ -196,7 +198,7 @@ namespace mathlib {
 		// need this because when value is close to 1 the series converges really slowly
 		// so to fix that I had to change the range from -1 to 1 to a range from -0.5 to 0.5
 		if (value > 0.5) {
-			return constants::PI / 2.0 - 2.0 * asin(sqrt((1 - value) / 2));
+			return constants::PI / 2.0 - 2.0 * asin(mathlib::sqrt((1 - value) / 2));
 		}
 		constexpr size_t PRECISION = 100;
 

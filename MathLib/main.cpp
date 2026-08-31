@@ -7,5 +7,5 @@
 #include <chrono>
 
 int main() {
-	std::cout << std::setprecision(10) << mathlib::cbrt(1000);
+	std::cout << std::setprecision(10) << 2 * mathlib::asin(1);
 }
