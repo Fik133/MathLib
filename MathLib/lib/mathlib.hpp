@@ -68,6 +68,42 @@ namespace mathlib {
 		return static_cast<T>(a + (b - a) * t);
 	}
 
+	inline double sqrt(double value) {
+		if (value < 0) return definitions::NaN;
+		if (value == 0) return 0.0;
+
+		// x_n+1 = 1/2(x_n + a/x_n)
+		double nterm = (value > 1.0) ? value / 2.0 : 1.0; // first guess and also x_n
+		double result = 0.0;
+
+		for (size_t i = 0; i < 12; i++)
+		{
+			result = (nterm + value / nterm) / 2.0;
+			nterm = result;
+		}
+
+		return result;
+	}
+
+	inline double cbrt(double value) {
+		if (value == 0) return 0.0;
+
+		bool is_negative = value < 0;
+		double abs_value = mathlib::abs(value);
+
+		double nterm = (abs_value > 1.0) ? abs_value / 2.0 : 1.0; // first guess and also x_n
+		double result = 0.0;
+
+		// x_n+1 = 1/3(2x_n + a/x_n^2)
+		for (size_t i = 0; i < 18; i++)
+		{
+			result = ((2 * nterm) + abs_value / (nterm * nterm)) / 3.0;
+			nterm = result;
+		}
+
+		return is_negative ? -result : result;
+	}
+
 	// Sine trigonometric function [Taylor series]
 	inline double sin(double angle) {
 		constexpr int PRECISION = 10; // length of the sine series, the higher the number the higher the precision
@@ -340,42 +376,5 @@ namespace mathlib {
 		}
 
 		return exp(ln(base) * power);
-	}
-
-	// add sqrt function and add it to asin function
-	inline double sqrt(double value) {
-		if (value < 0) return definitions::NaN;
-		if (value == 0) return 0.0;
-
-		// x_n+1 = 1/2(x_n + a/x_n)
-		double nterm = (value > 1.0) ? value / 2.0 : 1.0; // first guess and also x_n
-		double result = 0.0;
-
-		for (size_t i = 0; i < 12; i++)
-		{
-			result = (nterm + value / nterm) / 2.0;
-			nterm = result;
-		}
-
-		return result;
-	}
-
-	inline double cbrt(double value) {
-		if (value == 0) return 0.0;
-
-		bool is_negative = value < 0;
-		double abs_value = mathlib::abs(value);
-
-		double nterm = (abs_value > 1.0) ? abs_value / 2.0 : 1.0; // first guess and also x_n
-		double result = 0.0;
-
-		// x_n+1 = 1/3(2x_n + a/x_n^2)
-		for (size_t i = 0; i < 18; i++)
-		{
-			result = ((2 * nterm) + abs_value / (nterm * nterm)) / 3.0;
-			nterm = result;
-		}
-
-		return is_negative ? -result : result;
 	}
 }
