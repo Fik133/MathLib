@@ -7,5 +7,5 @@
 #include <chrono>
 
 int main() {
-	std::cout << mathlib::sqrt(3);
+	std::cout << std::setprecision(10) << mathlib::cbrt(1000);
 }
