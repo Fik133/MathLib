@@ -400,4 +400,20 @@ namespace mathlib {
 
 		return exp(ln(base) * power);
 	}
+
+	// Hyperbolic functions
+	// I don't really know what they're but I have an exp function and since I found their formula on the internet I implemented them
+	inline double sinh(double x) {
+		return (exp(x) - exp(-x)) / 2.0;
+	}
+
+	inline double cosh(double x) {
+		return (exp(x) + exp(-x)) / 2.0;
+	}
+
+	inline double tanh(double x) {
+		double e_pos = exp(x);
+		double e_neg = exp(-x);
+		return (e_pos - e_neg) / (e_pos + e_neg);
+	}
 }
