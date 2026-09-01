@@ -1,0 +1,12 @@
+{
+    "Version": "1.2",
+    "Data": {
+        "Source": "c:\\users\\domin\\source\\repos\\mathlib\\mathlib\\main.cpp",
+        "ProvidedModule": "",
+        "Includes": [
+            "c:\\users\\domin\\source\\repos\\mathlib\\mathlib\\lib\\mathlib.hpp"
+        ],
+        "ImportedModules": [],
+        "ImportedHeaderUnits": []
+    }
+}
