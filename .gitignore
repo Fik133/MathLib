@@ -1,7 +1,6 @@
 /*
 !.gitignore
-!/MathLib/
-!/MathLib/lib
-!/MathLib/lib/**
+!**/lib/
+!**/lib/**
 !README.md
 !LICENSE.txt
