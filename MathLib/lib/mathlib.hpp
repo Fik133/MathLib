@@ -1,4 +1,6 @@
-#include <math.h>
+#include <cstddef>
+
+#pragma once
 namespace mathlib {
 	namespace constants {
 		inline constexpr double PI = 3.14159265358979323846;
@@ -6,9 +8,9 @@ namespace mathlib {
 	}
 
 	namespace definitions {
-		inline const double NaN = 0.0 / 0.0;
-		inline const double INF_POSITIVE = 1.0 / 0.0;
-		inline const double INF_NEGATIVE = -1.0 / 0.0;
+		inline const double NaN = __builtin_nan("");
+		inline const double INF_POSITIVE = __builtin_inf();
+		inline const double INF_NEGATIVE = -__builtin_inf();
 	}
 
 	inline double degrees(double rad) {
@@ -31,6 +33,10 @@ namespace mathlib {
 		}
 
 		return i;
+	}
+
+	inline double trunc(double value) {
+		return static_cast<long long>(value);
 	}
 
 	inline double ceil(double value) {
@@ -66,6 +72,17 @@ namespace mathlib {
 	template<typename T>
 	inline T lerp(T a, T b, double t) {
 		return static_cast<T>(a + (b - a) * t);
+	}
+
+	inline double fmod(double x, double y) {
+		if (y == 0.0) // division by 0
+			return 0.0;
+
+		return x - trunc(x / y) * y;
+	}
+
+	inline short sign(double value) {
+		return (value > 0) - (value < 0); // same as  value == 0.0 ? 0 : (value > 0.0) ? 1 : -1;
 	}
 
 	// Newton-Raphson Method Square Root
@@ -104,6 +121,10 @@ namespace mathlib {
 		}
 
 		return is_negative ? -result : result;
+	}
+
+	inline double hypot(double x, double y) {
+		return mathlib::sqrt((x * x) + (y * y));
 	}
 
 	// Sine trigonometric function [Taylor series]
